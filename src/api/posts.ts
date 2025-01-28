@@ -1,11 +1,11 @@
 import { BASE_URL } from "../constants";
-import { Post } from "../types";
+import { Direction, Post, SortBy } from "../types";
 
 export const fetchPosts = async (
-  order: "id" | "views" = "id",
-  direction: "asc" | "desc" = "desc"
+  sortBy: SortBy = "id",
+  direction: Direction = "desc"
 ): Promise<Post[]> => {
-  const searchParams = new URLSearchParams({ order, direction });
+  const searchParams = new URLSearchParams({ sortBy, direction });
   const response = await fetch(
     `${BASE_URL}/api/posts?${searchParams.toString()}`
   );
@@ -34,7 +34,7 @@ export const incrementPostViews = async (postId: number): Promise<Post> => {
 };
 
 export const createPost = async (
-  newPost: Omit<Post, "id" | "views">
+  newPost: Omit<Post, "id" | "views" | "comments">
 ): Promise<Post> => {
   const response = await fetch(`${BASE_URL}/api/posts`, {
     method: "POST",
@@ -57,4 +57,24 @@ export const fetchPostComments = async (postId: number): Promise<string[]> => {
     throw new Error("Failed to fetch comments");
   }
   return response.json() as Promise<string[]>;
+};
+
+export const createPostComment = async (
+  postId: number,
+  comment: string
+): Promise<string> => {
+  const response = await fetch(
+    `http://localhost:3000/api/posts/${postId}/comments`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ comment }),
+    }
+  );
+  if (!response.ok) {
+    throw new Error("Failed to create a new comment");
+  }
+  return response.json();
 };

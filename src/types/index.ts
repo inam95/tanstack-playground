@@ -6,6 +6,7 @@ export type Post = {
   content: string;
   authorId: number;
   views: number;
+  comments: string[];
 };
 
 export type User = {
